@@ -50,7 +50,7 @@ topologyFQDN: tiger.osgdev.chtc.io
 # hostCertKeySecret: 
 
 image:
-  repository: hub.opensciencegrid.org/opensciencecgrid/stash-cache
+  repository: hub.opensciencegrid.org/opensciencegrid/stash-cache
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
