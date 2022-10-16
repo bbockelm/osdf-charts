@@ -1,4 +1,2 @@
----
 chart-dirs:
-  - osdf-cache
----
+  - charts
