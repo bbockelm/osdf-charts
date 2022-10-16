@@ -108,12 +108,14 @@ spec:
           - mountPath: /var/log/xrootd
             name: log-volume
           {{- end }}
+          {{- with .Values.hostCertKeySecret }}
           - mountPath: /etc/grid-security/hostcert.pem
             name: hostcertkey
             subPath: hostcert.pem
           - mountPath: /etc/grid-security/hostkey.pem
             name: hostcertkey
             subPath: hostkey.pem
+          {{- end }}
       {{- if .Values.hostNetwork }}
       hostNetwork: true
       {{- end }}
@@ -165,10 +167,10 @@ spec:
           {{- fail "Specify either claimName or hostPath" -}}
         {{- end }}
       {{- end }}
-      {{- if .Values.hostCertKeySecret }}
+      {{- with .Values.hostCertKeySecret }}
       - name: hostcertkey
         secret:
-          secretName: {{ .Values.hostCertKeySecret }}
+          secretName: {{ . }}
           items:
           - key: tls.crt
             path: hostcert.pem
