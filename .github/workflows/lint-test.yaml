@@ -33,7 +33,6 @@ jobs:
 
       - name: Install example volumes
         run: kubectl apply -n osdf -f tests/*.yaml
-      - run: kubectl get storageclass -o yaml
 
       # For now, run an install on all charts; we'll go back to "only on change"
       # later when the workflow's in a better shape.
