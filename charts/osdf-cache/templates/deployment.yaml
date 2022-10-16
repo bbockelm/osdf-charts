@@ -106,7 +106,7 @@ spec:
 {{- end }}
           {{- if .Values.logVolume }}
           - mountPath: /var/log/xrootd
-            name: logVolume
+            name: log-volume
           {{- end }}
           - mountPath: /etc/grid-security/hostcert.pem
             name: hostcertkey
@@ -178,7 +178,7 @@ spec:
             mode: 0o400
       {{- end }}
       {{- if .Values.logVolume }}
-      - name: logVolume
+      - name: log-volume
         {{- if .Values.logVolume.claimName }}
         persistentVolumeClaim:
           claimName: {{ .Values.logVolume.claimName }}
