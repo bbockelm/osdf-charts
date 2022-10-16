@@ -1,0 +1,88 @@
+##################################
+# Default values for osdf-cache. #
+##################################
+
+
+#
+# Configure the data volumes for use by the cache application.
+# If only a single volume is configured in the list, it will be
+# used for both the data and metadata mounts.  Otherwise, the number
+# of metadata and data volumes must match.
+#
+dataVolumes:
+# Each volume can either refer to a PVC or a hostPath
+- claimName: vol1
+- hostPath: /xcache/vol2
+metadataVolumes:
+- claimName: mvol1
+- hostPath: /xcache/mvol2
+# If there are multiple data volumes, a namespace volume is required.
+# This will maintain symlinks so there's a unified namespace across
+# the data volumes.
+namespaceVolume:
+  claimName: nvol
+  #hostPath: /xcache/namespace
+# If desired, logs for the service can be kept in a separate volume
+logVolume:
+  hostPath: /var/log/xcache
+
+# Customize the performance tuning knobs for the xcache application
+xcacheConfig: {}
+  #spaceLowWatermark: 800g
+  #spaceHighWatermark: 950g
+  #ramSize: 16g
+  #blockSize: 256k
+  #prefetch: 1
+  #writeQueueMaxBlocks: 10
+  #writeQueueThreads: 2
+
+# Name of the resource as registered in topology.opensciencegrid.org;
+# used to auto-configure the container
+topologyResourceName: TestSite
+topologyFQDN: tiger.osgdev.chtc.io
+
+image:
+  repository: hub.opensciencegrid.org/opensciencecgrid/stash-cache
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  httpPort: 8000
+  httpsPort: 8443
+  xrootdPort: 1094
+  # Any annotations needed by the service object
+  #annotations:
+  #  metallb.universe.tf/loadBalancerIPs: "28.135.8.11,2608:f89:210:a3::2"
+
+resources: {}
+  # you want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

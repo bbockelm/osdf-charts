@@ -1,0 +1,206 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "osdf-cache.fullname" . }}
+  labels:
+    {{- include "osdf-cache.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "osdf-cache.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "osdf-cache.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          env:
+          - name: XC_RESOURCENAME
+            value: {{ .Values.topologyResourceName }}
+          {{- with .Values.xcacheConfig.spaceLowWatermark }}
+          - name: XC_SPACE_LOW_WM
+            value: {{ . }}
+          {{- end }}
+          {{- with .Values.xcacheConfig.spaceHighWatermark }}
+          - name: XC_SPACE_HIGH_WM
+            value: {{ . }}
+          {{- end }}
+          {{- with .Values.xcacheConfig.ramSize }}
+          - name: XC_RAMSIZE
+            value: "{{ . }}"
+          {{- end }}
+          {{- with .Values.xcacheConfig.blockSize }}
+          - name: XC_BLOCKSIZE
+            value: "{{ . }}"
+          {{- end }}
+          {{- with .Values.xcacheConfig.prefetch }}
+          - name: XC_PREFETCH
+            value: "{{ . }}"
+          {{- end }}
+          {{- with .Values.xcacheConfig.writeQueueMaxBlocks }}
+          - name: XC_WQ_BLOCKS_PER_LOOP
+            value: "{{ . }}"
+          {{- end }}
+          {{- with .Values.xcacheConfig.writeQueueThreads }}
+          - name: XC_WQ_THREADS
+            value: "{{ . }}"
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          - name: xrootd
+            containerPort: 1094
+            protocol: TCP
+          - name: http
+            containerPort: 8000
+            hostPort: 8000
+            protocol: TCP
+          - name: https
+            containerPort: 8443
+            hostPort: 8443
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+{{- if not .Values.dataVolumes }}
+  {{- fail "dataVolume must be specified." }}
+{{- else if eq (len .Values.dataVolumes) 1 }}
+          - mountPath: /xcache
+            name: dataVolume0
+{{- else }}
+          {{- if ne (len .Values.dataVolumes) (len .Values.metadataVolumes) }}
+            {{- fail "metadataVolume length must match dataVolume length" }}
+          {{- end }}
+          {{- range untilStep 0 (len .Values.dataVolumes) 1 }}
+          - mountPath: /xcache/data{{- . }}
+            name: dataVolume{{- . }}
+          {{- end }}
+          {{- range untilStep 0 (len .Values.metadataVolumes) 1 }}
+          - mountPath: /xcache/meta{{- . }}
+            name: metadataVolume{{- .}}
+          {{- end }}
+          - mountPath: /xcache/namespace
+            name: namespaceVolume
+{{- end }}
+          {{- if .Values.logVolume }}
+          - mountPath: /var/log/xrootd
+            name: logVolume
+          {{- end }}
+          - mountPath: /etc/grid-security/hostcert.pem
+            name: hostcertkey
+            subPath: hostcert.pem
+          - mountPath: /etc/grid-security/hostkey.pem
+            name: hostcertkey
+            subPath: hostkey.pem
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nodeName }}
+      nodeName: {{ .Values.nodeName }}
+      {{- end }}
+      volumes:
+      {{- range untilStep 0 (len .Values.dataVolumes) 1 }}
+      {{- $volname := index $.Values.dataVolumes . }}
+      - name: dataVolume {{- . }}
+        {{- if and (not (empty $volname.claimName)) (not (empty $volname.hostPath)) }}
+          {{- fail "Specify claimName or hostPath, not both" -}}
+        {{- else if $volname.claimName }}
+        persistentVolumeClaim:
+          claimName: {{ $volname.claimName }}
+        {{- else if $volname.hostPath }}
+        hostPath:
+          path: {{ $volname.hostPath }}
+          type: Directory
+        {{- else }}
+          {{- fail "Specify either claimName or hostPath" -}}
+        {{- end }}
+      {{- end }}
+      {{- range untilStep 0 (len .Values.metadataVolumes) 1 }}
+      {{- $volname := index $.Values.dataVolumes . }}
+      - name: metadataVolume {{- . }}
+        {{- if and (not (empty $volname.claimName)) (not (empty $volname.hostPath)) }}
+          {{- fail "Specify claimName or hostPath, not both" -}}
+        {{- else if $volname.claimName }}
+        persistentVolumeClaim: 
+          claimName: {{ $volname.claimName }}
+        {{- else if $volname.hostPath }}
+        hostPath:
+          path: {{ $volname.hostPath }}
+          type: Directory
+        {{- else }} 
+          {{- fail "Specify either claimName or hostPath" -}}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.hostCertKeySecret }}
+      - name: hostcertkey
+        secret:
+          secretName: {{ .Values.hostCertKeySecret }}
+          items:
+          - key: tls.crt
+            path: hostcert.pem
+            mode: 0o644
+          - key: tls.key
+            path: hostkey.pem
+            mode: 0o400
+      {{- end }}
+      {{- if .Values.logVolume }}
+      - name: logVolume
+        {{- if .Values.logVolume.claimName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.logVolume.claimName }}
+        {{- else if .Values.logVolume.hostPath }}
+        hostPath:
+          path: {{ .Values.logVolume.hostPath }}
+          type: Directory
+        {{- else }}
+          {{- fail "logVolume must specify either hostPath or claimName" }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.namespaceVolume }}
+      - name: namespaceVolume
+        {{- if .Values.namespaceVolume.claimName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.namespaceVolume.claimName }}
+        {{- else if .Values.namespaceVolume.hostPath }}
+        hostPath:
+          path: {{ .Values.namespaceVolume.hostPath }}
+          type: Directory
+        {{- else }}
+          {{- fail "namespaceVolume must specify either hostPath or claimName" }}
+        {{- end }}
+      {{- end }}
+      # End volumes
