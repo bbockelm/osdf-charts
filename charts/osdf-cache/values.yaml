@@ -3,28 +3,32 @@
 ##################################
 
 
+###############################################################################
+# VOLUME CONFIGURATION
 #
 # Configure the data volumes for use by the cache application.
 # If only a single volume is configured in the list, it will be
 # used for both the data and metadata mounts.  Otherwise, the number
 # of metadata and data volumes must match.
 #
-dataVolumes:
+dataVolumes: {}
 # Each volume can either refer to a PVC or a hostPath
-- claimName: vol1
-- hostPath: /xcache/vol2
-metadataVolumes:
-- claimName: mvol1
-- hostPath: /xcache/mvol2
+#- claimName: vol1
+#- hostPath: /xcache/vol2
+metadataVolumes: {}
+#- claimName: mvol1
+#- hostPath: /xcache/mvol2
 # If there are multiple data volumes, a namespace volume is required.
 # This will maintain symlinks so there's a unified namespace across
 # the data volumes.
-namespaceVolume:
-  claimName: nvol
+namespaceVolume: {}
+  #claimName: nvol
   #hostPath: /xcache/namespace
 # If desired, logs for the service can be kept in a separate volume
-logVolume:
-  hostPath: /var/log/xcache
+logVolume: {}
+  #hostPath: /var/log/xcache
+
+###############################################################################
 
 # Customize the performance tuning knobs for the xcache application
 xcacheConfig: {}
@@ -40,6 +44,10 @@ xcacheConfig: {}
 # used to auto-configure the container
 topologyResourceName: TestSite
 topologyFQDN: tiger.osgdev.chtc.io
+
+# The name of a secret of type kubernetes.io/tls with the server certificate
+# to use. If not set, then we assume it's a HTTP-only cache.
+# hostCertKeySecret: 
 
 image:
   repository: hub.opensciencegrid.org/opensciencecgrid/stash-cache

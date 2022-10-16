@@ -1,0 +1,11 @@
+
+# Example of an XCache with a single PVC in use.
+dataVolumes:
+- claimName: vol1
+metadataVolumes:
+- claimName: mvol1
+namespaceVolume: {}
+  claimName: nvol
+
+topologyResourceName: TestSite
+topologyFQDN: tiger.osgdev.chtc.io
