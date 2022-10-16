@@ -4,7 +4,7 @@ dataVolumes:
 - claimName: vol1
 metadataVolumes:
 - claimName: mvol1
-namespaceVolume: {}
+namespaceVolume:
   claimName: nvol
 
 topologyResourceName: TestSite
