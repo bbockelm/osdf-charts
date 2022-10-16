@@ -31,5 +31,7 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.4.0
 
+      # For now, run an install on all charts; we'll go back to "only on change"
+      # later when the workflow's in a better shape.
       - name: Run chart-testing (install)
-        run: ct install
+        run: ct install --all
