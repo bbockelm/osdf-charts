@@ -32,10 +32,10 @@ jobs:
         uses: helm/kind-action@v1.4.0
 
       - name: Install example volumes
-        run: kubectl apply -f tests/*.yaml
+        run: kubectl apply -n osdf -f tests/*.yaml
       - run: kubectl get storageclass -o yaml
 
       # For now, run an install on all charts; we'll go back to "only on change"
       # later when the workflow's in a better shape.
       - name: Run chart-testing (install)
-        run: ct install --config ct.yaml --all
+        run: ct install --namespace osdf --config ct.yaml --all
