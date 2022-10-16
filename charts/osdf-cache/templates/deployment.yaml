@@ -77,14 +77,15 @@ spec:
             containerPort: 8443
             hostPort: 8443
             protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /osgconnect/public/dweitzel/stashcp/test.file
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /osgconnect/public/dweitzel/stashcp/test.file
-              port: http
+          # Comment out until we get the XCache image working.
+          #livenessProbe:
+          #  httpGet:
+          #    path: /osgconnect/public/dweitzel/stashcp/test.file
+          #    port: http
+          #readinessProbe:
+          #  httpGet:
+          #    path: /osgconnect/public/dweitzel/stashcp/test.file
+          #    port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
