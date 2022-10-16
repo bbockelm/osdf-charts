@@ -88,21 +88,21 @@ spec:
   {{- fail "dataVolume must be specified." }}
 {{- else if eq (len .Values.dataVolumes) 1 }}
           - mountPath: /xcache
-            name: dataVolume0
+            name: data-volume-0
 {{- else }}
           {{- if ne (len .Values.dataVolumes) (len .Values.metadataVolumes) }}
             {{- fail "metadataVolume length must match dataVolume length" }}
           {{- end }}
           {{- range untilStep 0 (len .Values.dataVolumes) 1 }}
           - mountPath: /xcache/data{{- . }}
-            name: dataVolume{{- . }}
+            name: data-volume-{{- . }}
           {{- end }}
           {{- range untilStep 0 (len .Values.metadataVolumes) 1 }}
           - mountPath: /xcache/meta{{- . }}
-            name: metadataVolume{{- .}}
+            name: metadata-volume-{{- .}}
           {{- end }}
           - mountPath: /xcache/namespace
-            name: namespaceVolume
+            name: namespace-volume
 {{- end }}
           {{- if .Values.logVolume }}
           - mountPath: /var/log/xrootd
@@ -135,7 +135,7 @@ spec:
       volumes:
       {{- range untilStep 0 (len .Values.dataVolumes) 1 }}
       {{- $volname := index $.Values.dataVolumes . }}
-      - name: dataVolume {{- . }}
+      - name: data-volume-{{- . }}
         {{- if and (not (empty $volname.claimName)) (not (empty $volname.hostPath)) }}
           {{- fail "Specify claimName or hostPath, not both" -}}
         {{- else if $volname.claimName }}
@@ -151,7 +151,7 @@ spec:
       {{- end }}
       {{- range untilStep 0 (len .Values.metadataVolumes) 1 }}
       {{- $volname := index $.Values.dataVolumes . }}
-      - name: metadataVolume {{- . }}
+      - name: metadata-volume-{{- . }}
         {{- if and (not (empty $volname.claimName)) (not (empty $volname.hostPath)) }}
           {{- fail "Specify claimName or hostPath, not both" -}}
         {{- else if $volname.claimName }}
@@ -191,7 +191,7 @@ spec:
         {{- end }}
       {{- end }}
       {{- if .Values.namespaceVolume }}
-      - name: namespaceVolume
+      - name: namespace-volume
         {{- if .Values.namespaceVolume.claimName }}
         persistentVolumeClaim:
           claimName: {{ .Values.namespaceVolume.claimName }}
