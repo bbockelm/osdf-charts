@@ -29,6 +29,10 @@ spec:
           env:
           - name: XC_RESOURCENAME
             value: {{ .Values.topologyResourceName }}
+          {{- with .Values.topologyFQDN }}
+          - name: CACHE_FQDN
+            value: {{ . }}
+          {{- end }}
           {{- with .Values.xcacheConfig.spaceLowWatermark }}
           - name: XC_SPACE_LOW_WM
             value: {{ . }}
