@@ -79,11 +79,11 @@ spec:
             protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /osgconnect/public/dweitzel/stashcp/test.file
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /osgconnect/public/dweitzel/stashcp/test.file
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
