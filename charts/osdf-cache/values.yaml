@@ -45,6 +45,17 @@ xcacheConfig: {}
 topologyResourceName: TestSite
 topologyFQDN: tiger.osgdev.chtc.io
 
+# Inject arbitrary files into the XRootD configuration.  A file will be dropped
+# into `/etc/xrootd/config.d/99-local.cfg` corresponding to the ConfigMap referred
+# to by `extraConfig`; the contents of the config file will be taken from the
+# `config` key.
+#
+# extraConfig: OSDFCacheConfig
+#
+# If set, `extraEarlyConfig` points at a ConfigMap that will be mounted at
+# `/etc/xrootd/config.d/00-local.cfg`.
+# extraEarlyConfig: OSDFCacheEarlyConfig
+
 # The name of a secret of type kubernetes.io/tls with the server certificate
 # to use. If not set, then we assume it's a HTTP-only cache.
 # hostCertKeySecret: 

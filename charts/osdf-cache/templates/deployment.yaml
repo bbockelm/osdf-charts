@@ -120,6 +120,15 @@ spec:
             name: hostcertkey
             subPath: hostkey.pem
           {{- end }}
+          {{- with .Values.extraConfig }}
+          - mountPath: /etc/xrootd/config.d/99-local.cfg
+            name: extraConfig
+            subPath: config
+          {{- end }}
+          {{- with .Values.extraEarlyConfig }}
+          - mountPath: /etc/xrootd/config.d/000-local.cfg
+            subPath: config
+          {{- end }}
       {{- if .Values.hostNetwork }}
       hostNetwork: true
       {{- end }}
@@ -170,6 +179,24 @@ spec:
         {{- else }} 
           {{- fail "Specify either claimName or hostPath" -}}
         {{- end }}
+      {{- end }}
+      {{- with .Values.extraConfig }}
+      - name: extraConfig
+        configMap:
+          name: {{ . }}
+          items:
+          - key: config
+            path: config
+            mode: 0o644
+      {{- end }}
+      {{- with .Values.extraEarlyConfig }}
+      - name: extraEarlyConfig
+        configMap:
+          name: {{ . }}
+          items:
+          - key: config
+            path: config
+            mode: 0o644
       {{- end }}
       {{- with .Values.hostCertKeySecret }}
       - name: hostcertkey

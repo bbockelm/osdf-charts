@@ -66,6 +66,8 @@ The following table lists the configurable parameters of the `osdf-cache` chart 
 | xcacheConfig.prefetch            | Number of prefetching blocks per open file.                                 | 10                 |
 | xcacheConfig.writeQueueMaxBlocks | The 'max blocks' variable in the `pfc.writequeue` XCache config.            | 16                 |
 | xcacheConfig.writeQueueThreads   | The 'nthreads' variable in the `pfc.writequeue` XCache config.              | 4                  |
+| extraConfig                      | Name of a ConfigMap; will mount the `config` key's value as a XCache config file | `""`          |
+| extraEarlyConfig                 | Name of a ConfigMap; will mount the `config` key's value as the first XCache config file | `""`  |
 | image.repository                 | Repository and project for the OSDF cache image                             | hub.opensciencegrid.org/opensciencecgrid/stash-cache |
 | image.pullPolicy                 | Pull policy for the cache pod.                                              | IfNotPresent       |
 | image.tag                        | Image tag to use.                                                           | `""`               |
