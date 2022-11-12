@@ -10,5 +10,8 @@ namespaceVolume:
 image:
   tag: "3.6-development"
 
+# Increases the debug levels for the CI
+extraConfig: debug-config
+
 topologyResourceName: CHTC-ITB-HELM-CACHE1
 topologyFQDN: helm-cache1.osgdev.chtc.io
