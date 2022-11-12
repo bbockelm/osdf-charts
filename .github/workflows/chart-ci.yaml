@@ -1,10 +1,10 @@
 
-name: Lint and Test Charts
+name: Lint and Test OSDF Chart
 
 on: [pull_request, push]
 
 jobs:
-  lint-test:
+  test-chart:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
