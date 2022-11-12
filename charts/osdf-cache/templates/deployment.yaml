@@ -122,11 +122,12 @@ spec:
           {{- end }}
           {{- with .Values.extraConfig }}
           - mountPath: /etc/xrootd/config.d/99-local.cfg
-            name: extraConfig
+            name: extra-config
             subPath: config
           {{- end }}
           {{- with .Values.extraEarlyConfig }}
           - mountPath: /etc/xrootd/config.d/000-local.cfg
+            name: extra-early-config
             subPath: config
           {{- end }}
       {{- if .Values.hostNetwork }}
@@ -181,7 +182,7 @@ spec:
         {{- end }}
       {{- end }}
       {{- with .Values.extraConfig }}
-      - name: extraConfig
+      - name: extra-config
         configMap:
           name: {{ . }}
           items:
@@ -190,7 +191,7 @@ spec:
             mode: 0o644
       {{- end }}
       {{- with .Values.extraEarlyConfig }}
-      - name: extraEarlyConfig
+      - name: extra-early-config
         configMap:
           name: {{ . }}
           items:
