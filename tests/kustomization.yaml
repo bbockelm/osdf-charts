@@ -3,3 +3,9 @@ resources:
 - ns.yaml
 - pvc.yaml
 
+configMapGenerator:
+- name: debug-config
+  files:
+  - config=debug.cfg
+generatorOptions:
+  disableNameSuffixHash: true
