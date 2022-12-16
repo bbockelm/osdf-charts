@@ -71,11 +71,9 @@ spec:
             protocol: TCP
           - name: http
             containerPort: 8000
-            hostPort: 8000
             protocol: TCP
           - name: https
             containerPort: 8443
-            hostPort: 8443
             protocol: TCP
           livenessProbe:
             httpGet:
